@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Badam Satti Game🃏🕹️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* CSS from game_play.html */
+        :root {
+            --bg-color-light: #E0F7FA;
+            --bg-color-dark: #CFE9EE;
+            --primary-blue: #53CAE5;
+            --primary-blue-dark: #47B4CC;
+            --dark-text: #263238;
+            --medium-text: #546e7a;
+            --light-gray-border: #b0bec5;
+            --white-bg: white;
+            --success-green: #4caf50; /* Primary green for playable cards */
+            --error-red: #f44336;
+            --warning-yellow: #ffc107;
+        }
+        body {
+            margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg-color-light);
+            color: var(--dark-text); display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto;
+        }
+        .game-container {
+            width: 100%; max-width: 1200px; background: var(--white-bg); border-radius: 20px;
+            padding: 25px; border: 1px solid var(--light-gray-border);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); display: grid;
+            grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; gap: 20px;
+            min-height: 90vh; position: relative; overflow: hidden; z-index: 1;
+        }
+        .game-container::before {
+            content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
+            border-radius: 22px; background: conic-gradient(from var(--angle), var(--primary-blue),
+            transparent 0.1turn, transparent 0.4turn, var(--primary-blue) 0.5turn, transparent 0.6turn,
+            transparent 0.9turn, var(--primary-blue)); background-size: 200% 200%;
+            animation: rotate-border 4s linear infinite forwards; z-index: -1; padding: 2px;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+        }
+        @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+        @keyframes rotate-border { to { --angle: 360deg; } }
+        .players-container {
+            display: flex; justify-content: space-around; gap: 20px; padding: 15px;
+            background-color: var(--bg-color-dark); border-radius: 15px; flex-wrap: wrap;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        .player-hand-wrapper {
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            min-width: 120px; transition: transform 0.2s ease-in-out;
+        }
+        .player-hand-wrapper.active-turn { transform: translateY(-5px) scale(1.02); }
+        .player-info {
+            text-align: center; font-size: 1.1em; font-weight: 600; color: var(--dark-text);
+        }
+        .current-player-indicator { color: var(--success-green); font-weight: bold; }
+        .other-player-cards-stack {
+            position: relative; width: 70px; height: 90px; display: flex;
+            justify-content: center; align-items: center; border-radius: 10px;
+            background-color: var(--primary-blue); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform-style: preserve-3d;
+        }
+        .other-player-cards-stack.no-cards {
+            background-color: var(--light-gray-border); box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+        }
+        .other-player-cards-stack::before, .other-player-cards-stack::after {
+            content: ''; position: absolute; width: 100%; height: 100%; border-radius: 10px;
+            background-color: var(--primary-blue); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .other-player-cards-stack::before { transform: translateZ(-2px) translateY(-4px) rotateX(5deg); opacity: 0.8; background-color: var(--primary-blue-dark); }
+        .other-player-cards-stack::after { transform: translateZ(-4px) translateY(-8px) rotateX(10deg); opacity: 0.6; }
+        .card-count-overlay {
+            position: absolute; color: white; font-size: 1.5em; font-weight: 700; z-index: 10;
+            background-color: rgba(0, 0, 0, 0.3); border-radius: 50%; width: 40px; height: 40px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .other-player-cards-stack.no-cards .card-count-overlay { display: none; }
+        .game-desk-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 20px; padding: 25px; background-color: var(--bg-color-dark); border-radius: 20px;
+            border: 2px dashed var(--light-gray-border); box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .desk-suits {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; max-width: 900px;
+        }
+        .desk-suit-row {
+            display: flex; /* Changed to flex */
+            flex-wrap: wrap; /* Allow cards to wrap to the next line */
+            gap: 10px; /* Gap between cards, horizontal and vertical */
+            justify-content: flex-start; /* Align cards to the left within the row */
+            align-items: flex-start; /* Align cards to the top when wrapping */
+            min-height: 100px;
+            padding: 10px;
+            padding-left: 90px; /* Increased padding to make space for the suit icon */
+            background-color: var(--white-bg);
+            border-radius: 15px;
+            border: 1px solid var(--light-gray-border);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden; /* Hide anything that overflows */
+        }
+        .desk-suit-row .suit-icon-display {
+            position: absolute;
+            left: 25px; /* Adjusted position to match new padding */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3em;
+            height: 3em;
+            color: var(--medium-text);
+            opacity: 0.6;
+            z-index: 1; /* Ensure icon is above cards */
+        }
+        .desk-suit-row .suit-icon-display.red-suit { color: var(--error-red); }
+        .desk-suit-row .suit-icon-display.black-suit { color: var(--dark-text); }
+
+        /* Card Base Styles */
+        .card {
+            width: 60px; /* Fixed width for cards */
+            height: 90px; /* Fixed height for cards */
+            background-color: var(--white-bg);
+            border-radius: 10px;
+            border: 1px solid var(--light-gray-border);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            font-weight: bold;
+            font-size: 1.1em;
+            user-select: none;
+            transition: all 0.2s ease; /* Smooth transitions for visual changes */
+            position: relative;
+            color: var(--dark-text);
+            flex-shrink: 0; /* Prevent cards from shrinking below their width */
+            z-index: 0; /* Default z-index */
+        }
+
+        /* Styles for DISABLED (non-playable) cards -- MODIFIED */
+        .card.disabled {
+            opacity: 0.9;
+            cursor: not-allowed;
+            filter: grayscale(25%);
+            border: 1px solid var(--light-gray-border); /* Standard border */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Standard shadow */
+            transform: none; /* Ensure no lifting/scaling */
+        }
+
+        /* Styles for PLAYABLE cards - MODIFIED FOR SOFTER GLOW */
+        .card.playable-card {
+            border: 1.5px solid var(--success-green); /* Slightly thinner border */
+            /* Softer, multi-layered glow for a modern feel */
+            box-shadow:
+                0 0 5px 0px rgba(76, 175, 80, 0.2), /* Very subtle initial layer */
+                0 0 10px 1px rgba(76, 175, 80, 0.3); /* Slightly more prominent layer */
+            cursor: pointer; /* Indicate it's clickable */
+            opacity: 1; /* Ensure full opacity */
+            filter: none; /* Remove grayscale */
+        }
+
+        /* Hover effect specifically for PLAYABLE cards - MODIFIED FOR CLEANER POP */
+        .card.playable-card:hover {
+            transform: translateY(-8px) scale(1.08); /* Lifts and slightly enlarges on hover */
+            /* More pronounced but still clean shadow on hover */
+            box-shadow:
+                0 10px 20px rgba(0, 0, 0, 0.2), /* Base shadow for lift (standard drop shadow) */
+                0 0 25px 8px rgba(76, 175, 80, 0.6); /* Clearer, brighter glow on hover */
+        }
+
+        /* Highlight for specific action (e.g., currently selected card, if applicable) */
+        /* Consider adjusting this if it conflicts with playable-card:hover or other states */
+        .card.highlight { box-shadow: 0 0 15px 7px #ffeb3b; transform: scale(1.1); }
+
+        .rank-top, .rank-bottom { font-size: 0.9em; line-height: 1; }
+        .suit-middle { width: 2.2em; height: 2.2em; }
+        .red-suit { color: var(--error-red); }
+        .black-suit { color: var(--dark-text); }
+        .game-status {
+            text-align: center; font-size: 1.6em; font-weight: 700; margin-bottom: 20px; color: var(--dark-text);
+        }
+        .game-controls {
+            display: flex;
+            justify-content: center; /* This will center the .pass-button-group */
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        /* Wrapper for button and emoji to keep them grouped */
+        .pass-button-group {
+            display: flex;
+            align-items: center; /* Vertically align the button and emoji */
+            /* Removed gap here; spacing is handled by emoji's margin-left */
+        }
+
+        /* New spacer div to balance the emoji's width for perfect centering */
+        .pass-button-left-spacer {
+            width: 0; /* Initially no width */
+            height: 1px; /* Minimal height to be a flex item */
+            flex-shrink: 0; /* Prevent shrinking */
+            transition: width 0.3s ease; /* Smooth transition for width change */
+        }
+
+        /* Class added by JS to activate the spacer */
+        .pass-button-left-spacer.active-spacer {
+            width: 45px; /* Approximate width of the emoji (2.2em ~35px) + its margin-left (10px) */
+        }
+
+        .button {
+            padding: 10px 25px; border: none; border-radius: 12px; background: var(--primary-blue);
+            color: white; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+            text-transform: uppercase; letter-spacing: 0.5px; text-decoration: none;
+        }
+        .button:hover { background: var(--primary-blue-dark); transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); }
+        .button:disabled { background-color: var(--light-gray-border); color: var(--medium-text); cursor: not-allowed; transform: none; box-shadow: none; }
+        /* Style for enabled button when it's NOT disabled */
+        .button:enabled {
+            background: var(--success-green); /* Green color when enabled */
+        }
+        .button:enabled:hover {
+            background: #449d44; /* A slightly darker shade of green on hover for enabled state */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        .game-over-controls { display: none; margin-top: 20px; }
+        .reconnect-message {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--dark-text);
+            padding: 25px 35px; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.6); text-align: center;
+            z-index: 1000; backdrop-filter: blur(8px); font-size: 1.2em; font-weight: 600;
+            border: 2px solid var(--warning-yellow); color: white; display: none;
+        }
+        #message-container {
+            position: fixed; top: -70px; left: 50%; transform: translateX(-50%); background-color: var(--primary-blue-dark);
+            color: white; padding: 12px 25px; border-radius: 10px; z-index: 2000; opacity: 0; visibility: hidden;
+            transition: all 0.4s ease-in-out; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); font-weight: 500;
+        }
+        #message-container.visible { opacity: 1; top: 25px; visibility: visible; }
+        #player-hand-bottom { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding: 10px; }
+
+        /* Animation for the pointing emoji */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Style for the emoji to push it to the right from the button */
+        #pass-button-hint-emoji {
+            margin-left: 10px; /* Space between button and emoji */
+            display: none; /* Initially hidden, takes no space */
+        }
+        /* When emoji is visible, set display to inline-block */
+        #pass-button-hint-emoji.visible-emoji {
+            display: inline-block;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            body { padding: 10px; }
+            .game-container { padding: 15px; gap: 15px; }
+            /* FIXED: Keep players in horizontal row on tablets */
+            .players-container { 
+                flex-direction: row; /* Keep horizontal */
+                justify-content: space-around; /* Distribute evenly */
+                gap: 15px; 
+                flex-wrap: wrap; /* Allow wrapping if needed */
+            }
+            .player-hand-wrapper { 
+                flex-direction: column; /* Keep vertical layout for each player */
+                align-items: center; /* Center align */
+                min-width: 100px; /* Slightly smaller for tablets */
+            }
+            .desk-suits { grid-template-columns: 1fr; }
+            .desk-suit-row {
+                justify-content: flex-start;
+                padding-left: 70px; /* Adjusted for smaller screens */
+                min-height: 80px;
+            }
+            .desk-suit-row .suit-icon-display { left: 15px; } /* Adjusted for smaller screens */
+            .card { width: 50px; height: 75px; }
+        }
+
+        @media (max-width: 600px) {
+            .game-container { padding: 10px; gap: 10px; min-height: 95vh; }
+            /* FIXED: Maintain horizontal layout on mobile */
+            .players-container { 
+                padding: 10px; 
+                gap: 8px; /* Smaller gap for mobile */
+                flex-direction: row; /* Keep horizontal */
+                justify-content: space-evenly; /* Even distribution */
+                align-items: flex-start; /* Align to top */
+            }
+            .player-hand-wrapper { 
+                gap: 5px; 
+                min-width: 80px; /* Smaller width for mobile */
+                flex-direction: column; /* Keep vertical layout */
+                align-items: center;
+            }
+            .player-info { font-size: 0.9em; }
+            .other-player-cards-stack { width: 60px; height: 80px; }
+            .card-count-overlay { font-size: 1.2em; width: 35px; height: 35px; }
+            .game-desk-container { padding: 15px; gap: 15px; }
+            .desk-suit-row { padding-left: 70px; min-height: 70px; } /* Adjusted for mobile */
+            .desk-suit-row .suit-icon-display { left: 15px; width: 2.5em; height: 2.5em; } /* Adjusted for mobile */
+            .card { width: 45px; height: 65px; font-size: 1em; }
+            .rank-top, .rank-bottom { font-size: 0.8em; }
+            .suit-middle { width: 1.8em; height: 1.8em; }
+            .game-status { font-size: 1.3em; margin-bottom: 15px; }
+            .button { padding: 8px 20px; font-size: 0.9em; }
+            #pass-button-hint-emoji { font-size: 1.8em; margin-left: 8px; }
+            .pass-button-left-spacer.active-spacer { width: 35px; } /* Adjust spacer for smaller emoji */
+            #player-hand-bottom { padding: 5px; gap: 8px; }
+            .reconnect-message { padding: 15px 20px; font-size: 1em; }
+            #message-container { padding: 10px 20px; font-size: 0.9em; }
+        }
+
+        @media (max-width: 400px) {
+            body { padding: 5px; }
+            .game-container { padding: 8px; border-radius: 15px; }
+            .players-container { padding: 8px; }
+            .player-info { font-size: 0.8em; }
+            .other-player-cards-stack { width: 55px; height: 75px; }
+            .card-count-overlay { font-size: 1em; width: 30px; height: 30px; }
+            .game-desk-container { padding: 10px; }
+            .desk-suit-row { padding-left: 60px; min-height: 60px; } /* Adjusted for very small mobile */
+            .desk-suit-row .suit-icon-display { left: 10px; width: 2em; height: 2em; } /* Adjusted for very small mobile */
+            .card { width: 40px; height: 60px; font-size: 0.9em; }
+            .rank-top, .rank-bottom { font-size: 0.7em; }
+            .suit-middle { width: 1.5em; height: 1.5em; }
+            .game-status { font-size: 1.1em; margin-bottom: 10px; }
+            .button { padding: 6px 15px; font-size: 0.8em; }
+            #pass-button-hint-emoji { font-size: 1.5em; margin-left: 6px; }
+            .pass-button-left-spacer.active-spacer { width: 30px; } /* Adjust spacer for smaller emoji */
+            #player-hand-bottom { padding: 3px; gap: 5px; }
+            .reconnect-message { padding: 10px 15px; font-size: 0.9em; }
+            #message-container { padding: 8px 15px; font-size: 0.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="players-container" id="player-hands-top"></div>
+        <div class="game-desk-container">
+            <div class="game-status" id="game-status-message">Loading...</div>
+            <div class="desk-suits" id="desk-suits-container">
+                <div class="desk-suit-row" id="desk-H" data-suit="H">
+                    <span class="suit-icon-display red-suit"><svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,85 C20,65 5,40 5,25 C5,10 20,0 35,0 C50,0 50,20 50,20 C50,20 50,0 65,0 C80,0 95,10 95,25 C95,40 80,65 50,85 Z"/></svg></span>
+                </div>
+                <div class="desk-suit-row" id="desk-D" data-suit="D">
+                    <span class="suit-icon-display red-suit"><svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L95,50 L50,95 L5,50 Z"/></svg></span>
+                </div>
+                <div class="desk-suit-row" id="desk-C" data-suit="C">
+                    <span class="suit-icon-display black-suit"><svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="30" r="25"/><circle cx="30" cy="60" r="25"/><circle cx="70" cy="60" r="25"/><path d="M45 75 L55 75 L50 95 Z"/></svg></span>
+                </div>
+                <div class="desk-suit-row" id="desk-S" data-suit="S">
+                    <span class="suit-icon-display black-suit"><svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,45 A20,20 0 0,1 70,75 L50,95 L30,75 A20,20 0 0,1 10,45 L50,5 Z"/></svg></span>
+                </div>
+            </div>
+            <div class="game-controls">
+                <div class="pass-button-group">
+                    <div class="pass-button-left-spacer"></div> <button id="pass-turn-button" class="button" disabled>Pass Turn</button>
+                    <span id="pass-button-hint-emoji" style="font-size: 2.2em; animation: bounce 0.8s infinite alternate;">👈</span>
+                </div>
+            </div>
+            <div class="game-over-controls" id="game-over-controls">
+                <a href="/" class="button">Back to Home</a>
+            </div>
+            <div id="scorecard-section" style="display: none; width: 100%; margin-top: 20px;">
+                <h3 style="color: var(--dark-text); font-size: 1.5em; margin-bottom: 15px;">Final Scoreboard</h3>
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background-color: var(--primary-blue-dark); color: white;">
+                            <th style="padding: 12px 15px; border-radius: 8px 0 0 8px;">Rank</th>
+                            <th style="padding: 12px 15px;">Player</th>
+                            <th style="padding: 12px 15px;">Score (Lower is Better)</th>
+                            <th style="padding: 12px 15px; border-radius: 0 8px 8px 0;">Cards Left</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scorecard-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="player-hand" id="player-hand-bottom"></div>
+    </div>
+    <div class="reconnect-message" id="reconnect-message">
+        <p id="reconnect-text"></p>
+        <p>Time remaining: <span id="reconnect-timer">120</span>s</p>
+        <button class="button" id="reconnect-button" style="display: none;">Reconnect</button>
+    </div>
+    <div id="message-container"></div>
+
+    <script>
+        const gameId = '{{ game_id }}';
+        const csrfToken = '{{ csrf_token }}';
+
+        const suitIcons = {
+            'H': '<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,85 C20,65 5,40 5,25 C5,10 20,0 35,0 C50,0 50,20 50,20 C50,20 50,0 65,0 C80,0 95,10 95,25 C95,40 80,65 50,85 Z"/></svg>',
+            'D': '<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L95,50 L50,95 L5,50 Z"/></svg>',
+            'C': '<svg viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="30" r="25"/><circle cx="30" cy="60" r="25"/><circle cx="70" cy="60" r="25"/><path d="M45 75 L55 75 L50 95 Z"/></svg>',
+            'S': '<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 L90,45 A20,20 0 0,1 70,75 L50,95 L30,75 A20,20 0 0,1 10,45 L50,5 Z"/></svg>'
+        };
+
+        const suitColors = { 'H': 'red-suit', 'D': 'red-suit', 'C': 'black-suit', 'S': 'black-suit' };
+        let lastGameState = null;
+        let autoRefreshInterval = null, reconnectTimerInterval = null, pingInterval = null;
+        let isGamePausedByDisconnect = false;
+
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('message-container');
+            container.textContent = message;
+            container.className = 'visible';
+            if (type === 'error') container.style.backgroundColor = 'var(--error-red)';
+            else if (type === 'success') container.style.backgroundColor = 'var(--success-green)';
+            else container.style.backgroundColor = 'var(--primary-blue-dark)';
+            setTimeout(() => { container.classList.remove('visible'); }, 3000);
+        }
+
+        function startAutoRefresh() { if (!autoRefreshInterval) autoRefreshInterval = setInterval(fetchGameState, 2500); }
+        function stopAutoRefresh() { if (autoRefreshInterval) { clearInterval(autoRefreshInterval); autoRefreshInterval = null; } }
+        function startPing() { if (!pingInterval) pingInterval = setInterval(sendPing, 1000); }
+        function stopPing() { if (pingInterval) { clearInterval(pingInterval); pingInterval = null; } }
+
+        async function sendPing() {
+            try {
+                const response = await fetch(`/player_ping/${gameId}/`, {
+                    method: 'POST', headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' }, body: JSON.stringify({})
+                });
+                if (!response.ok) {
+                    const data = await response.json();
+                    if (response.status === 403) {
+                        showMessage(data.message, 'error'); stopAutoRefresh(); stopPing();
+                        setTimeout(() => window.location.href = '/', 3000);
+                    }
+                }
+            } catch (error) { console.error("Error sending ping:", error); }
+        }
+
+        // Renamed 'isClickable' to 'isPlayable' for better semantic meaning
+        function renderCard(card_num, card_name, isPlayable = false) {
+            const rank = card_name.length === 2 ? card_name[0] : card_name.substring(0, 2);
+            const suit = card_name.slice(-1);
+            const cardDiv = document.createElement('div');
+            // Dynamically assign 'playable-card' or 'disabled' class
+            cardDiv.className = `card ${suitColors[suit]} ${isPlayable ? 'playable-card' : 'disabled'}`;
+            cardDiv.dataset.cardNum = card_num;
+            cardDiv.dataset.cardName = card_name;
+            cardDiv.innerHTML = `<div class="rank-top">${rank}</div><div class="suit-middle">${suitIcons[suit]}</div><div class="rank-bottom">${rank}</div>`;
+            return cardDiv;
+        }
+
+        function renderYourHand(hand, validMoves, isYourTurn, isGamePaused) {
+            const handContainer = document.getElementById('player-hand-bottom');
+            handContainer.innerHTML = '';
+            hand.sort((a, b) => a[0] - b[0]).forEach(card => {
+                const isPlayable = validMoves.includes(card[0]) && isYourTurn && !isGamePaused;
+                const cardElement = renderCard(card[0], card[1], isPlayable); // Pass isPlayable to renderCard
+                if (isPlayable) cardElement.addEventListener('click', handleCardClick);
+                handContainer.appendChild(cardElement);
+            });
+        }
+
+        function renderOtherPlayers(players, yourPlayerNum, currentPlayerTurn, isGamePaused) {
+            const container = document.getElementById('player-hands-top');
+            container.innerHTML = '';
+            players.forEach(player => {
+                if (player.player_num !== yourPlayerNum) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'player-hand-wrapper';
+                    if (player.player_num === currentPlayerTurn && !isGamePaused) {
+                        wrapper.classList.add('active-turn');
+                    }
+
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'player-info';
+                    infoDiv.textContent = `${player.name} ${player.player_num === 1 ? '(Host)' : ''}`;
+                    if (player.player_num === currentPlayerTurn && !isGamePaused) {
+                        infoDiv.classList.add('current-player-indicator');
+                    }
+
+                    const stackDiv = document.createElement('div');
+                    stackDiv.className = `other-player-cards-stack ${player.hand_size === 0 ? 'no-cards' : ''}`;
+                    stackDiv.innerHTML = `<div class="card-count-overlay">${player.hand_size}</div>`;
+
+                    wrapper.appendChild(infoDiv);
+                    wrapper.appendChild(stackDiv);
+                    container.appendChild(wrapper);
+                }
+            });
+        }
+
+        function renderDesk(deskCards) {
+            ['H', 'D', 'C', 'S'].forEach(suit => {
+                const suitRow = document.getElementById(`desk-${suit}`);
+                suitRow.querySelectorAll('.card').forEach(c => c.remove());
+                if (deskCards[suit]) {
+                    deskCards[suit].sort((a, b) => a[0] - b[0]).forEach(card => {
+                        suitRow.appendChild(renderCard(card[0], card[1], false));
+                    });
+                }
+            });
+        }
+
+        async function handleCardClick(event) {
+            const cardElement = event.currentTarget;
+            if (isGamePausedByDisconnect) { showMessage("Game is paused.", 'error'); return; }
+            const cardNum = parseInt(cardElement.dataset.cardNum);
+            // Temporarily disable all cards to prevent multiple clicks before state updates
+            document.querySelectorAll('#player-hand-bottom .card').forEach(c => c.classList.add('disabled'));
+            document.querySelectorAll('#player-hand-bottom .card').forEach(c => c.classList.remove('playable-card')); // Also remove playable state
+            try {
+                const response = await fetch(`/play_card/${gameId}/`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                    body: JSON.stringify({ card_num: cardNum })
+                });
+                const data = await response.json();
+                showMessage(data.message, response.ok ? (data.game_over ? 'success' : 'info') : 'error');
+            } catch (error) { showMessage('Network error occurred.', 'error'); }
+            finally { fetchGameState(); } // Always fetch game state to refresh UI
+        }
+
+        function updateGameStatus(gs) {
+            const statusDiv = document.getElementById('game-status-message');
+            const passBtn = document.getElementById('pass-turn-button');
+            const overControls = document.getElementById('game-over-controls');
+            const hintEmoji = document.getElementById('pass-button-hint-emoji');
+            const isYourTurn = gs.your_player_num === gs.current_player_turn;
+            isGamePausedByDisconnect = gs.disconnected_player !== null;
+            const scorecardSection = document.getElementById('scorecard-section');
+            const scorecardBody = document.getElementById('scorecard-body');
+
+            if (gs.game_over) {
+                if (gs.terminated_due_to_disconnect) {
+                    statusDiv.textContent = gs.message;
+                    statusDiv.style.color = 'var(--error-red)';
+                } else {
+                    const winnerMatch = gs.message.match(/The winner is (.+?)\./);
+                    const winnerName = winnerMatch ? winnerMatch[1] : 'Someone';
+                    statusDiv.textContent = `🎉 Congratulations, ${winnerName}! You are the Badam Satti Champion! 🏆`;
+                    statusDiv.style.color = 'var(--success-green)';
+                }
+                passBtn.style.display = 'none';
+                overControls.style.display = 'block';
+                hintEmoji.style.display = 'none'; // Hide emoji when game is over
+                stopAutoRefresh();
+                stopPing();
+                
+                // ADDED: Logic to display scores
+                if (gs.scores && gs.scores.length > 0) {
+                    scorecardBody.innerHTML = ''; // Clear previous scores
+                    gs.scores.forEach((player, index) => {
+                        const rank = index + 1;
+                        const row = `
+                            <tr style="background-color: ${rank === 1 ? '#e8f5e9' : 'transparent'}; font-weight: ${rank === 1 ? 'bold' : 'normal'};">
+                                <td style="padding: 10px 15px;">${rank === 1 ? '🏆' : rank}</td>
+                                <td style="padding: 10px 15px;">${player.name}</td>
+                                <td style="padding: 10px 15px;">${player.score}</td>
+                                <td style="padding: 10px 15px;">${player.remaining_cards}</td>
+                            </tr>
+                        `;
+                        scorecardBody.innerHTML += row;
+                    });
+                    scorecardSection.style.display = 'block';
+                }
+
+            } else if (isGamePausedByDisconnect) {
+                const pName = gs.players.find(p => p.player_num === gs.disconnected_player)?.name;
+                statusDiv.textContent = `Game paused: ${pName || 'Player'}'s disconnected.`;
+                statusDiv.style.color = 'var(--warning-yellow)';
+                passBtn.disabled = true;
+                hintEmoji.style.display = 'none'; // Hide emoji when game is paused
+            } else {
+                const pName = gs.players.find(p => p.player_num === gs.current_player_turn)?.name;
+                statusDiv.textContent = isYourTurn ? 'Your Turn!' : `${pName || 'Player'}'s Turn`;
+                statusDiv.style.color = isYourTurn ? 'var(--success-green)' : 'var(--dark-text)';
+                // MODIFIED: Pass button logic
+                passBtn.disabled = !isYourTurn;
+
+                // Logic for hint emoji
+                if (isYourTurn && gs.valid_moves.length === 0) { // If it's your turn and no valid moves
+                    hintEmoji.style.display = 'inline'; // Show the emoji
+                } else {
+                    hintEmoji.style.display = 'none'; // Hide the emoji
+                }
+            }
+        }
+
+        async function fetchGameState() {
+            if (lastGameState && lastGameState.game_over) return;
+            try {
+                const response = await fetch(`/get_game_state/${gameId}/`);
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                const gs = await response.json();
+
+                renderYourHand(gs.your_hand, gs.valid_moves, gs.your_player_num === gs.current_player_turn, gs.disconnected_player !== null);
+                renderOtherPlayers(gs.players, gs.your_player_num, gs.current_player_turn, gs.disconnected_player !== null);
+                renderDesk(gs.desk_cards);
+                updateGameStatus(gs);
+
+                const recMsgDiv = document.getElementById('reconnect-message');
+                if (gs.disconnected_player) {
+                    recMsgDiv.style.display = 'block';
+                    const pName = gs.players.find(p => p.player_num === gs.disconnected_player)?.name || 'A player';
+                    document.getElementById('reconnect-text').textContent = `${pName} has disconnected. The game is paused.`;
+                    // Always restart the timer with the latest authoritative time from the server.
+                    startReconnectTimer(gs.reconnect_time_left);
+                } else {
+                    recMsgDiv.style.display = 'none';
+                    stopReconnectTimer();
+                }
+                lastGameState = gs;
+            } catch (error) {
+                console.error("Fetch error:", error);
+                showMessage('Lost server connection.', 'error');
+                stopAutoRefresh();
+                stopPing();
+            }
+        }
+
+        function stopReconnectTimer() {
+            if (reconnectTimerInterval) clearInterval(reconnectTimerInterval);
+            reconnectTimerInterval = null;
+        }
+
+        function startReconnectTimer(initialTime) {
+            stopReconnectTimer(); // Clear any existing timer to prevent duplicates
+            let timeLeft = initialTime;
+            const timerElement = document.getElementById('reconnect-timer');
+
+            if (timerElement) timerElement.textContent = timeLeft;
+
+            reconnectTimerInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft >= 0 && timerElement) {
+                    timerElement.textContent = timeLeft;
+                } else {
+                    // Timer reached zero
+                    stopReconnectTimer();
+                    // Fetch the game state again to get the server's final decision (e.g., game terminated)
+                    fetchGameState();
+                }
+            }, 1000);
+        }
+
+        document.getElementById('pass-turn-button').addEventListener('click', async () => {
+            if (isGamePausedByDisconnect) return;
+            try {
+                const response = await fetch(`/pass_turn/${gameId}/`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken }
+                });
+                if (!response.ok) { const data = await response.json(); throw new Error(data.message); }
+                showMessage("Turn passed.", 'success');
+            } catch (error) { showMessage(error.message, 'error'); }
+            finally { fetchGameState(); }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchGameState();
+            startAutoRefresh();
+            startPing();
+        });
+        window.addEventListener('beforeunload', () => {
+            stopAutoRefresh();
+            stopPing();
+        });
+    </script>
+</body>
+</html>

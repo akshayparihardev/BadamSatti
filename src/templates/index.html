@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badam Satti Home🃏</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Base Styles from index (1).html */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background-color: #dbeafe; /* Lighter, softer blue background */
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Main Wrapper for Centering */
+        .main-wrapper {
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+        }
+
+        /* Game Container (Main Card) */
+        .game-container {
+            background: linear-gradient(145deg, #ffffff, #f0f8ff);
+            border-radius: 25px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+            padding: 50px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Game Header */
+        .game-header {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .game-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1e40af;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Player Input Section */
+        .player-input {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .input-group {
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 1.05rem;
+        }
+        .input-group input[type="text"] {
+            width: 100%;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            color: #333;
+            transition: all 0.3s ease;
+            background-color: #edf2f7;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05), inset -2px -2px 5px rgba(255,255,255,0.8);
+        }
+        .input-group input:focus {
+            outline: none;
+            background-color: #ffffff;
+            box-shadow: 
+                0 0 0 3px #93c5fd,
+                inset 2px 2px 5px rgba(0,0,0,0.08);
+        }
+
+        /* Player Count Selection */
+        .player-count-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .player-count-btn {
+            background: #e0e7ff;
+            color: #3b82f6;
+            border: none;
+            padding: 14px 22px;
+            border-radius: 50px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-grow: 1;
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.08), -3px -3px 8px rgba(255,255,255,0.8);
+        }
+        .player-count-btn.selected {
+            background: linear-gradient(145deg, #3b82f6, #2563eb);
+            color: white;
+            box-shadow: 
+                inset 2px 2px 5px rgba(0,0,0,0.2),
+                inset -2px -2px 5px rgba(255,255,255,0.5);
+        }
+        .player-count-btn:hover:not(.selected) {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+            box-shadow: 5px 5px 12px rgba(0,0,0,0.1), -5px -5px 12px rgba(255,255,255,0.9);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            width: 100%;
+            margin-top: 35px;
+        }
+        .action-btn {
+            background: linear-gradient(145deg, #298DDC, #1f6bb2);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 50px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 8px 8px 20px rgba(41, 141, 220, 0.25), -8px -8px 20px rgba(255,255,255,0.8);
+        }
+        .action-btn:hover {
+            background: linear-gradient(145deg, #2478c0, #1a5a9e);
+            transform: translateY(-2px);
+            box-shadow: 10px 10px 25px rgba(41, 141, 220, 0.35), -10px -10px 25px rgba(255,255,255,0.9);
+        }
+
+        /* Custom Alert Box Styles */
+        #custom-alert-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: flex;
+            justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #custom-alert-overlay.visible { opacity: 1; visibility: visible; }
+        .custom-alert-box {
+            background-color: white; padding: 35px; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); text-align: center;
+            max-width: 450px; width: 90%; transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        #custom-alert-overlay.visible .custom-alert-box { transform: translateY(0); }
+        .custom-alert-box p {
+            font-size: 1.15rem; color: #333; margin-bottom: 25px; line-height: 1.4;
+        }
+        .custom-alert-box button {
+            background-color: #298DDC; color: white; border: none; padding: 12px 25px;
+            border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .custom-alert-box button:hover { background-color: #2478c0; transform: translateY(-1px); }
+
+        /* --- Mobile Responsiveness --- */
+
+        /* For screens smaller than 600px */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px; /* Reduce overall padding */
+            }
+
+            .game-container {
+                padding: 30px; /* Adjust container padding */
+                gap: 20px; /* Reduce gap between elements */
+            }
+
+            .game-header h2 {
+                font-size: 2rem; /* Smaller heading for mobile */
+            }
+
+            .input-group label {
+                font-size: 1rem; /* Slightly smaller label font */
+            }
+
+            .input-group input[type="text"] {
+                padding: 14px 18px; /* Reduce input padding */
+                font-size: 1rem; /* Smaller input font */
+            }
+
+            .player-count-selection {
+                gap: 10px; /* Adjust gap between buttons */
+            }
+
+            .player-count-btn {
+                padding: 12px 20px; /* Adjust button padding */
+                font-size: 1rem; /* Smaller button font */
+            }
+
+            .action-buttons {
+                gap: 15px; /* Adjust gap between action buttons */
+            }
+
+            .action-btn {
+                padding: 16px 25px; /* Adjust action button padding */
+                font-size: 1.05rem; /* Slightly smaller action button font */
+                gap: 10px; /* Adjust gap for icon */
+            }
+        }
+
+        /* For screens smaller than 480px (very small phones) */
+        @media (max-width: 480px) {
+            .game-container { 
+                padding: 25px 20px; /* Further reduce padding */
+                gap: 15px; /* Further reduce gap */
+            }
+            .game-header h2 { 
+                font-size: 1.6rem; /* Even smaller heading */
+            }
+            .input-group input[type="text"] {
+                padding: 12px 15px; /* Even smaller input padding */
+            }
+            .player-count-selection {
+                flex-direction: column; /* Stack buttons vertically on very small screens */
+                align-items: stretch; /* Make them fill the width */
+            }
+            .player-count-btn { 
+                flex-basis: auto; /* Reset flex-basis for full width */
+                padding: 10px 15px; /* Even smaller button padding */
+            }
+            .action-btn { 
+                font-size: 1rem; /* Adjust action button font size */
+                padding: 14px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="game-container">
+            <div class="game-header">
+                <h2>🃏♠️Badam Satti♥️🃏</h2>
+            </div>
+            
+            <form action="{% url 'create_room' %}" method="POST" id="createRoomForm">
+                {% csrf_token %}
+                <div class="player-input">
+                    <div class="input-group">
+                        <label for="player-name">Your Name</label>
+                        <input type="text" id="player-name" name="player_name" placeholder="Enter your name" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Number of Players</label>
+                        <div class="player-count-selection" id="player-count-selection">
+                            <button type="button" class="player-count-btn" data-players="2">2 Players</button>
+                            <button type="button" class="player-count-btn" data-players="3">3 Players</button>
+                            <button type="button" class="player-count-btn selected" data-players="4">4 Players</button>
+                            <button type="button" class="player-count-btn" data-players="5">5 Players</button>
+                            <button type="button" class="player-count-btn" data-players="6">6 Players</button>
+                        </div>
+                        <input type="hidden" id="selected_num_players" name="num_players" value="4">
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" id="createRoomBtn" class="action-btn">
+                        <i class="fas fa-plus-circle"></i> Create Room
+                    </button>
+                </div>
+            </form>
+            
+            <a href="{% url 'join_room' %}" class="action-btn" id="joinRoomBtn">
+                <i class="fas fa-sign-in-alt"></i> Join a Room
+            </a>
+        </div>
+    </div>
+
+    <div id="custom-alert-overlay">
+        <div class="custom-alert-box">
+            <p id="custom-alert-message"></p>
+            <button id="custom-alert-button">OK</button>
+        </div>
+    </div>
+
+<script>
+    // showAlert function for popups, matching the new UI's style
+    function showAlert(message) {
+        const overlay = document.getElementById('custom-alert-overlay');
+        const alertMessage = document.getElementById('custom-alert-message');
+        const alertButton = document.getElementById('custom-alert-button');
+
+        alertMessage.textContent = message;
+        overlay.classList.add('visible');
+        
+        const closeAlert = () => {
+            overlay.classList.remove('visible');
+            alertButton.removeEventListener('click', closeAlert);
+        };
+        alertButton.addEventListener('click', closeAlert);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const createRoomForm = document.getElementById('createRoomForm');
+        const playerNameInput = document.getElementById('player-name');
+        const playerCountButtons = document.querySelectorAll('.player-count-btn');
+        const selectedNumPlayersInput = document.getElementById('selected_num_players');
+
+        // Handle player count button clicks
+        playerCountButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                playerCountButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedNumPlayersInput.value = this.dataset.players;
+            });
+        });
+
+        // Form submission validation
+        createRoomForm.addEventListener('submit', function(e) {
+            const playerName = playerNameInput.value.trim();
+            if (!playerName) {
+                e.preventDefault(); // Stop form submission
+                showAlert('Please enter your name!');
+                playerNameInput.focus();
+                return false;
+            }
+        });
+    });
+</script>
+</body>
+</html>

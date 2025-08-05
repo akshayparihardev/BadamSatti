@@ -86,7 +86,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'akshayparihardev$default',
         'USER': 'akshayparihardev',
-        'PASSWORD': 'badamdev' + os.environ.get('DB_PASSWORD'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': 'akshayparihardev.mysql.pythonanywhere-services.com',
         'OPTIONS': {
             'sql_mode': 'STRICT_TRANS_TABLES',

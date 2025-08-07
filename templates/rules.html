@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Rules - Badam Satti</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif;
+        }
+        body {
+            background-color: #dbeafe; color: #333;
+            line-height: 1.6; padding: 20px;
+        }
+        .main-container {
+            width: 100%; max-width: 800px; margin: 20px auto;
+        }
+        .rules-container {
+            background: linear-gradient(145deg, #ffffff, #f0f8ff);
+            border-radius: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+            padding: 40px 50px;
+        }
+        .rules-container h1 {
+            font-size: 2.5rem; font-weight: 800; color: #1e40af;
+            margin-bottom: 30px; letter-spacing: -1px; text-align: center;
+        }
+        .rules-section {
+            margin-bottom: 35px;
+        }
+        .rules-section h2 {
+            font-size: 1.6rem; font-weight: 700; color: #1f6bb2;
+            padding-bottom: 10px; border-bottom: 2px solid #93c5fd;
+            margin-bottom: 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .rules-section p, .rules-section ul {
+            font-size: 1.05rem; color: #4b5563; margin-bottom: 15px;
+        }
+        .rules-section ul {
+            list-style-position: inside; padding-left: 10px;
+        }
+        .rules-section li {
+            margin-bottom: 10px;
+        }
+        .back-link {
+            text-align: center; margin-top: 25px;
+        }
+        .back-link a {
+            color: #1e40af; text-decoration: none; font-size: 1rem;
+            font-weight: 600; display: inline-flex; align-items: center;
+            gap: 8px; transition: all 0.2s ease;
+            padding: 10px 20px; border-radius: 50px; background-color: #e0e7ff;
+        }
+        .back-link a:hover {
+            background-color: #c7d2fe; transform: translateY(-2px);
+        }
+        @media (max-width: 600px) {
+            .rules-container { padding: 30px 25px; }
+            .rules-container h1 { font-size: 2rem; }
+            .rules-section h2 { font-size: 1.4rem; }
+            .rules-section p, .rules-section ul { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="rules-container">
+            <h1>Game Rules</h1>
+
+            <div class="rules-section">
+                <h2>Objective 🎯</h2>
+                <p>The main goal of Badam Satti is to be the first player to get rid of all your cards.</p>
+            </div>
+
+            <div class="rules-section">
+                <h2>Setup ⚙️</h2>
+                <ul>
+                    <li>The game is played with a standard 52-card deck. 🃏</li>
+                    <li>All cards are dealt out as evenly as possible among the players. 👥🔄</li>
+                    <li>The player with the 7 of Hearts (♥️7) starts the game. 🚀</li>
+                </ul>
+            </div>
+
+            <div class="rules-section">
+                <h2>Gameplay 🎮</h2>
+                <ul>
+                    <li>The first player must play the 7 of Hearts.</li>
+                    <li>On your turn, you can play a card if it builds upon the cards already on the table or you may choose to pass the turn . 🃏➡️</li>
+                    <li>Cards are built up and down in sequence for each suit (e.g., if the ♥️7 is played, the next cards can be ♥️6 or ♥️8). ⬆️⬇️🔢</li>
+                    <li>The 7s of other suits (♦️7, ♣️7, ♠️7) can be played at any time to start a new suit row. 💎✨</li>
+                    <li>If you cannot play a valid card, you must pass your turn. 🚫⏭️</li>
+                </ul>
+            </div>
+
+             <div class="rules-section">
+                <h2>Winning the Game 🏆</h2>
+                <p>The first player to play all of their cards is declared the winner. 🥇🎉 Scoring is based on the cards remaining in players' hands (lower is better). 📊👐</p>
+            </div>
+            
+            <div class="back-link">
+                <a href="{% url 'index' %}"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

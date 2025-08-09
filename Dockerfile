@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED 1
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the requirements file and install dependencies
+# Copy the cleaned-up requirements file and install dependencies
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -23,6 +23,5 @@ RUN python manage.py collectstatic --no-input
 # Expose the port Gunicorn will run on
 EXPOSE 8000
 
-# Run the Gunicorn server
-# Make sure 'project.wsgi' matches your project folder name
+# Run the Gunicorn server (This is the standard way)
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "project.wsgi:application"]

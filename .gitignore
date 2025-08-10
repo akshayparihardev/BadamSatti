@@ -1,0 +1,21 @@
+# Environment variables
+# NEVER commit your .env file!
+.env
+
+# Databases
+# Ignore the development database
+db.sqlite3
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+
+# Django-specific
+# Ignore the folder where collectstatic places files
+staticfiles/
+# Ignore user-uploaded files
+media/
+
+# IDE/Editor folders
+.vscode/
+.idea/

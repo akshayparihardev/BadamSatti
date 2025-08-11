@@ -158,4 +158,6 @@ docker-compose exec web python manage.py migrate
 <a href="https://github.com/Adhishree21" target="_blank" title="Adhishree" style="margin-right: 15px;">
 <img src="https://github.com/Adhishree21.png" width="60" height="60" style="border-radius:50%; box-shadow:0 4px 12px rgba(0,0,0,0.15);" alt="Adhishree">
 </a>
+<a href="https://github.com/Janhavi1214" target="_blank" title="Janhavi" style="margin-right: 15px;">
+<img src="https://github.com/Janhavi1214.png" width="60" height="60" style="border-radius:50%; box-shadow:0 4px 12px rgba(0,0,0,0.15);" alt="Janhavi">
 </p>
